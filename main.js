@@ -66,7 +66,7 @@ function getActiveWindowBounds() {
 
 // ── 吸附逻辑 ──────────────────────────────────────
 const SNAP_DISTANCE = 80;  // 吸附触发距离
-const PET_W = 280, PET_H = 340;
+const PET_W = 252, PET_H = 306;
 
 function calcSnapPosition(petBounds, winBounds, scrBounds) {
   if (!winBounds || !scrBounds) return null;
@@ -125,11 +125,11 @@ function createPetWindow() {
     x: sw - PET_W - 40, y: sh - PET_H - 40,
     transparent: true, frame: false, alwaysOnTop: true,
     resizable: false, skipTaskbar: true, hasShadow: false,
+    useContentSize: false,
     webPreferences: {
       contextIsolation: true,
       preload: path.join(__dirname, "preload.js"),
       backgroundThrottling: false,
-      enablePreferredSizeMode: true,
     },
   });
   mainWindow.setIgnoreMouseEvents(false);
@@ -167,6 +167,42 @@ function startSnapPolling() {
 }
 function stopSnapPolling() {
   if (snapTimer) { clearTimeout(snapTimer); snapTimer = null; }
+}
+
+// ── 番茄钟 ────────────────────────────────────────
+let pomo = { state: "idle", endTime: null, remaining: 0, phase: "work", cycles: 0 };
+let pomoTimer = null;
+
+function pomoStart(sec, phase) {
+  pomo.state = "running"; pomo.phase = phase || "work";
+  pomo.endTime = Date.now() + sec * 1000; pomo.remaining = sec;
+  broadcastPomo(); if (!pomoTimer) pomoTick();
+}
+function pomoStop() {
+  pomo.state = "idle"; pomo.endTime = null; pomo.remaining = 0;
+  broadcastPomo();
+}
+function broadcastPomo() {
+  if (mainWindow && !mainWindow.isDestroyed())
+    mainWindow.webContents.send("pomo-status", { state: pomo.state, remaining: pomo.remaining, phase: pomo.phase, cycles: pomo.cycles });
+}
+function pomoTick() {
+  if (pomo.state === "running" && pomo.endTime) {
+    pomo.remaining = Math.max(0, Math.round((pomo.endTime - Date.now()) / 1000));
+    broadcastPomo();
+    if (pomo.remaining <= 0) {
+      if (pomo.phase === "work") {
+        pomo.cycles++;
+        pomo.state = "done"; broadcastPomo();
+        const next = pomo.cycles % 4 === 0 ? "longBreak" : "shortBreak";
+        setTimeout(() => pomoStart(next === "longBreak" ? 900 : 300, next), 4000);
+      } else {
+        pomo.state = "done"; broadcastPomo();
+        setTimeout(() => pomoStop(), 8000);
+      }
+    }
+  }
+  pomoTimer = setTimeout(pomoTick, 1000);
 }
 
 // ── 托盘 ──────────────────────────────────────────
@@ -335,7 +371,8 @@ function setDefaultChar(id) {
 ipcMain.on("set-window-pos", (e, { x, y }) => {
   if (mainWindow) {
     snapTarget = null;
-    mainWindow.setPosition(Math.round(x), Math.round(y));
+    // setBounds 同时设位置+尺寸，不给任何变大的机会
+    mainWindow.setBounds({ x: Math.round(x), y: Math.round(y), width: PET_W, height: PET_H });
   }
 });
 ipcMain.handle("get-window-pos", () => {
@@ -349,6 +386,38 @@ ipcMain.handle("get-theme", () => currentTheme);
 ipcMain.on("set-character", (e, id) => setCharacter(id));
 ipcMain.handle("get-character", () => currentCharacter);
 ipcMain.on("set-default-char", (e, id) => setDefaultChar(id));
+ipcMain.on("pomo-start", (e, d) => pomoStart(d.seconds, d.phase));
+ipcMain.on("pomo-stop", () => pomoStop());
+ipcMain.handle("get-pomo", () => ({ state: pomo.state, remaining: pomo.remaining, phase: pomo.phase, cycles: pomo.cycles }));
+
+// 原生右键菜单 — 不再用 HTML, 彻底杜绝撑大窗口
+ipcMain.on("show-context-menu", (e, { charId }) => {
+  if (!mainWindow) return;
+  const charMenu = Object.entries({
+    mochi:"🍡 小麻薯",cat:"🐱 小橘猫",dog:"🐶 小柯基",bunny:"🐰 小白兔",
+    duck:"🦆 小黄鸭",swan:"🦢 小天鹅",pony:"🐴 小棕马",
+    ironman:"🦸 钢铁侠",thanos:"💜 灭霸"
+  }).map(([id,name]) => ({ label: (id===charId?"✔ ":"  ")+name, click: () => setCharacter(id) }));
+  const themeMenu = currentCharacter==="mochi" ? ["warm","cool","blossom","forest","midnight"].map(t => ({
+    label: (currentTheme===t?"✔ ":"  ")+themeLabel(t), click: () => setTheme(t)
+  })) : null;
+  const pomoItems = pomo.state==="idle" ? [
+    { label: "🍅 25分钟专注", click: () => pomoStart(1500,"work") },
+    { label: "☕ 5分钟休息", click: () => pomoStart(300,"shortBreak") },
+    { label: "🧘 15分钟长休", click: () => pomoStart(900,"longBreak") },
+  ] : [{ label: "⏹ 停止计时", click: () => pomoStop() }];
+  const tpl = [
+    { label: "🎭 切换角色", submenu: charMenu },
+    { label: "⭐ 设为默认", click: () => { defaultCharacter=charId; saveConfig({...loadConfig(),defaultCharacter:charId}); } },
+    ...(themeMenu?[{ label: "🎨 主题", submenu: themeMenu }]:[]),
+    { type: "separator" }, ...pomoItems, { type: "separator" },
+    { label: "👆 穿透模式", type: "checkbox", checked: isPassthrough, click: () => togglePassthrough() },
+    { label: "🧲 窗口吸附", type: "checkbox", checked: snapEnabled, click: () => toggleSnapping() },
+    { label: "📍 重置位置", click: () => { const {width:sw,height:sh}=screen.getPrimaryDisplay().workArea; mainWindow.setPosition(sw-PET_W-40,sh-PET_H-40); } },
+    { label: "🚪 退出", click: () => app.quit() },
+  ];
+  Menu.buildFromTemplate(tpl).popup({ window: mainWindow });
+});
 
 // ── 启动 ──────────────────────────────────────────
 app.commandLine.appendSwitch("enable-gpu-rasterization");

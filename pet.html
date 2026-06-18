@@ -67,12 +67,12 @@
    基础
    ═══════════════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;background:transparent;overflow:hidden;user-select:none;-webkit-user-select:none;font-family:"Segoe UI","Microsoft YaHei",sans-serif;-webkit-transform:translateZ(0);transform:translateZ(0)}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden!important;user-select:none;-webkit-user-select:none;font-family:"Segoe UI","Microsoft YaHei",sans-serif;zoom:0.9}
 
 /* ═══════════════════════════════════════════
    场景
    ═══════════════════════════════════════════ */
-.scene{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;padding-bottom:30px;transition:opacity .3s;overflow:visible}
+.scene{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;padding-bottom:8px;transition:opacity .3s;overflow:hidden!important}
 
 /* ═══════════════════════════════════════════
    气泡
@@ -256,28 +256,6 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden;user-sel
 .pet-container.state-error .blush{opacity:0}
 
 /* ═══════════════════════════════════════════
-   右键菜单
-   ═══════════════════════════════════════════ */
-.context-menu{position:fixed;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.15);padding:6px 0;min-width:155px;max-height:320px;overflow-y:auto;z-index:999;display:none;font-size:13px}
-.context-menu::-webkit-scrollbar{width:4px}
-.context-menu::-webkit-scrollbar-track{background:transparent}
-.context-menu::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
-.context-menu::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25)}
-.context-menu.show{display:block}
-.context-menu .item{padding:8px 16px;cursor:pointer;color:#3d2c1e;transition:background .15s;display:flex;align-items:center;gap:6px}
-.context-menu .item:hover{background:rgba(255,140,66,.12)}
-.context-menu .item.danger{color:#d32f2f}
-.context-menu .item .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
-.context-menu .divider{height:1px;background:rgba(0,0,0,.08);margin:4px 0}
-.context-menu .submenu{position:relative}
-.context-menu .submenu-arrow{position:absolute;right:12px}
-.context-menu .sub-list{display:none;padding:0 0 4px 0;margin:0 8px;border-left:2px solid rgba(255,140,66,.3)}
-.context-menu .sub-list.open{display:block}
-.context-menu .sub-list .item{padding:5px 12px;font-size:12px;border-radius:6px}
-.context-menu .sub-list .item:hover{background:rgba(255,140,66,.12)}
-.context-menu .submenu{position:relative;cursor:pointer}
-.context-menu .submenu-arrow{position:absolute;right:12px;transition:transform .2s}
-.context-menu .submenu.open .submenu-arrow{transform:rotate(90deg)}
 
 /* ═══════════════════════════════════════════
    状态灯
@@ -288,6 +266,12 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden;user-sel
 .status-light.working{background:#FF8C42;box-shadow:0 0 6px rgba(255,140,66,.6)}
 .status-light.waiting{background:#FFD54F;box-shadow:0 0 8px rgba(255,213,79,.7);animation:light-pulse .8s ease-in-out infinite}
 @keyframes light-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* 番茄钟 */
+.pomo-display{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:5px;background:rgba(0,0,0,.55);color:#fff;padding:3px 10px;border-radius:10px;font-size:12px;z-index:6;pointer-events:none;white-space:nowrap}
+.pomo-display.active{display:flex}
+.pomo-display .pomo-time{font-weight:700;font-variant-numeric:tabular-nums}
+.pomo-display.urgent .pomo-time{color:#FF8C42;animation:light-pulse .5s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -320,20 +304,11 @@ html,body{width:100%;height:100%;background:transparent;overflow:hidden;user-sel
 
   <div class="status-light" id="statusLight"></div>
 
-  <!-- 右键菜单 -->
-  <div class="context-menu" id="contextMenu">
-    <div class="item" data-action="about">🐱 关于 Claude Pet</div>
-    <div class="divider"></div>
-    <div class="item label" style="color:#999;font-size:11px;cursor:default">🎭 切换角色</div>
-    <div id="charPickerInline" style="max-height:130px;overflow-y:auto"></div>
-    <div class="divider"></div>
-    <div class="item" data-action="passthrough">🔒 开启穿透</div>
-    <div class="item" data-action="snap" id="snapMenuItem">🧲 吸附: 开</div>
-    <div class="item" data-action="reset">📍 重置位置</div>
-    <div class="item" data-action="hide">👀 隐藏 10 秒</div>
-    <div class="divider"></div>
-    <div class="item danger" data-action="quit">🚪 退出</div>
-  </div>
+  <!-- 番茄钟 -->
+  <div class="pomo-display" id="pomoDisplay"><span class="pomo-icon"></span><span class="pomo-time" id="pomoTime"></span></div>
+
+  <!-- 调试: 窗口尺寸 -->
+
 
 </div>
 
@@ -352,27 +327,8 @@ const scene=document.getElementById('scene'),petContainer=document.getElementByI
    角色系统
    ═══════════════════════════════════════════ */
 const charWrap=document.getElementById('charWrap');
-const charPicker=document.getElementById('charPickerInline');
-let currentChar='cat';
-
-function buildCharPicker(){
-  charPicker.innerHTML='';
-  Object.entries(CHARACTERS).forEach(([id,c])=>{
-    if(id==='default')return;
-    const div=document.createElement('div');
-    div.className='item'+(id===currentChar?' active':'');
-    div.dataset.action='char-'+id;
-    div.innerHTML=`<span class="preview">${c.emoji}</span> ${c.name}`;
-    div.addEventListener('click',e=>{e.stopPropagation();switchCharacter(id);contextMenu.classList.remove('show');contextMenu.style.display='none';});
-    charPicker.appendChild(div);
-  });
-  // "设为默认" 按钮
-  const setDef=document.createElement('div');
-  setDef.className='item';setDef.style.cssText='color:#FF8C42;font-weight:600;border-top:1px solid rgba(0,0,0,.06);margin-top:2px;padding-top:7px';
-  setDef.innerHTML='⭐ 设为默认角色';
-  setDef.addEventListener('click',e=>{e.stopPropagation();if(window.claudePet)window.claudePet.setDefaultChar(currentChar);contextMenu.classList.remove('show');contextMenu.style.display='none';showBubble('⭐ 默认角色已设置!',2000);});
-  charPicker.appendChild(setDef);
-}
+let currentChar='mochi';
+function buildCharPicker(){} // 已迁移到原生菜单, 保留空函数避免报错
 
 function renderCharacter(id){
   const c=CHARACTERS[id]||CHARACTERS.mochi;
@@ -616,42 +572,28 @@ document.addEventListener('mouseup',e=>{
    右键菜单
    ═══════════════════════════════════════════ */
 document.addEventListener('contextmenu',e=>{
-  e.preventDefault();updatePassthroughLabel();
-  if(snapMenuItem)snapMenuItem.textContent='🧲 吸附: '+(snapActive?'开':'关');
-  // 先 invisible 渲染以测量尺寸
-  contextMenu.style.visibility='hidden';
-  contextMenu.style.display='block';
-  contextMenu.style.left='0';contextMenu.style.top='0';
-  const mw=contextMenu.offsetWidth,mh=contextMenu.offsetHeight;
-  // 计算不越界的位置 (向右展开, 不够则向左; 向下展开, 不够则向上)
-  let mx=e.clientX,my=e.clientY;
-  if(mx+mw>window.innerWidth-5)mx=e.clientX-mw;
-  if(my+mh>window.innerHeight-5)my=e.clientY-mh;
-  if(mx<0)mx=5;if(my<0)my=5;
-  contextMenu.style.left=mx+'px';contextMenu.style.top=my+'px';
-  contextMenu.style.visibility='visible';
-  contextMenu.classList.add('show');
+  e.preventDefault();
+  if(window.claudePet)window.claudePet.showContextMenu({charId:currentChar});
 });
-document.addEventListener('click',e=>{if(!contextMenu.contains(e.target)){contextMenu.classList.remove('show');contextMenu.style.display='none'}});
-contextMenu.addEventListener('click',e=>{
-  const a=e.target.dataset.action,t=e.target.dataset.theme;
-  if(!a&&!t)return;contextMenu.classList.remove('show');contextMenu.style.display='none';
-  if(t&&a==='theme'){if(window.claudePet)window.claudePet.setTheme(t);applyTheme(t);showBubble('🎨 主题切换!',1500)}
-  // 展开/折叠子菜单
-  if(e.target.classList.contains('item')&&e.target.classList.contains('submenu')){
-    e.stopPropagation();e.target.classList.toggle('open');
-    const sl=e.target.querySelector('.sub-list');if(sl)sl.classList.toggle('open');
-    return;
+// HTML 菜单已移除, 右键改用 Electron 原生 Menu
+
+/* ═══════════════════════════════════════════
+   番茄钟
+   ═══════════════════════════════════════════ */
+const pomoDisp=document.getElementById('pomoDisplay'),pomoTime=document.getElementById('pomoTime');
+function fmtTime(s){const m=Math.floor(s/60),sec=s%60;return m+':'+(sec<10?'0':'')+sec}
+function updatePomo(d){
+  if(!d||d.state==='idle'){pomoDisp.classList.remove('active','urgent');return}
+  pomoDisp.classList.add('active');pomoTime.textContent=fmtTime(d.remaining);
+  pomoDisp.classList.toggle('urgent',d.remaining<60);
+  pomoDisp.querySelector('.pomo-icon').textContent=d.phase==='work'?'🍅':d.phase==='shortBreak'?'☕':'🧘';
+  if(d.state==='done'){
+    pomoTime.textContent='00:00';pomoDisp.classList.add('urgent');
+    if(d.phase==='work'){showBubble('🎉 专注完成! 休息~',4000);spawnParticles(['🎉','✨'],6)}
+    else showBubble('☕ 休息结束!',3000);
   }
-  switch(a){
-    case'passthrough':if(window.claudePet)window.claudePet.togglePassthrough();break;
-    case'snap':if(window.claudePet)window.claudePet.toggleSnapping();showBubble(snapActive?'吸附已关闭':'吸附已开启! 🧲',1500);break;
-    case'reset':showBubble('回到原位! 🏠',1500);break;
-    case'hide':showBubble('10秒后回来~ 😴',2000);scene.style.opacity='0';if(hideTimer)clearTimeout(hideTimer);hideTimer=setTimeout(()=>{scene.style.opacity='1'},10000);break;
-    case'quit':showBubble('再见! 👋',1000);setTimeout(()=>window.close(),1200);break;
-    case'about':showBubble('🐱 Claude Pet v1.1 — 主题/吸附/动画!',3000);break;
-  }
-});
+}
+if(window.claudePet){window.claudePet.onPomoStatus(d=>updatePomo(d));window.claudePet.getPomo().then(d=>updatePomo(d));}
 
 /* ═══════════════════════════════════════════
    启动

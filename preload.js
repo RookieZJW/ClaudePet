@@ -17,6 +17,11 @@ contextBridge.exposeInMainWorld("claudePet", {
   setTheme: (t) => ipcRenderer.send("set-theme", t),
   setCharacter: (id) => ipcRenderer.send("set-character", id),
   setDefaultChar: (id) => ipcRenderer.send("set-default-char", id),
+  pomoStart: (s, p) => ipcRenderer.send("pomo-start", { seconds: s, phase: p }),
+  pomoStop: () => ipcRenderer.send("pomo-stop"),
+  onPomoStatus: (cb) => ipcRenderer.on("pomo-status", (e, d) => cb(d)),
+  showContextMenu: (d) => ipcRenderer.send("show-context-menu", d),
+  getPomo: () => ipcRenderer.invoke("get-pomo"),
 
   platform: process.platform,
 });
