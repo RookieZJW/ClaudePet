@@ -1,0 +1,127 @@
+{
+  "_comment": "将此配置合并到 ~/.claude/settings.json 的 hooks 字段中。注意替换 update-status.js 的实际路径。",
+  "_instructions": "运行 node -e \"console.log(require('path').resolve('E:/claude-pet/update-status.js'))\" 获取正确的路径格式",
+
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" session_start",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" thinking",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" tool_use \"$CLAUDE_TOOL_NAME\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" processing",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" idle",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" session_end",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" waiting_permission",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" compacting",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" subagent_start",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"E:/claude-pet/update-status.js\" processing",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
+}

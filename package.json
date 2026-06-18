@@ -1,0 +1,29 @@
+{
+  "name": "claude-pet",
+  "version": "1.0.0",
+  "description": "桌面宠物 — 实时反映 Claude Code 的状态",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable",
+    "build:installer": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.claudepet.app",
+    "productName": "Claude Pet",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["portable", "nsis"],
+      "icon": "assets/icon.ico"
+    },
+    "portable": {
+      "artifactName": "ClaudePet.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

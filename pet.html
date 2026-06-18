@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script src="characters.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   CSS 变量 — 5 套主题共用
+   ═══════════════════════════════════════════ */
+:root, .theme-warm {
+  --body-1: #FFF5EE; --body-2: #FFE0CC; --body-3: #F0C8A0;
+  --ear-1: #F0C8A0; --ear-2: #E8B888;
+  --antenna: #D4A878; --antball-1: #FFB74D; --antball-2: #FF8C42;
+  --antglow: rgba(255,140,66,0.5); --antglow2: rgba(255,140,66,0.8);
+  --blush: rgba(255,170,150,0.45); --mouth: #b08868;
+  --arm-1: #FFE0CC; --arm-2: #F0C8A0; --foot: #E8C8A8;
+  --pupil-1: #4a3728; --pupil-2: #1a0f08;
+  --shadow: rgba(180,120,60,0.18); --shadow-inner: rgba(180,100,40,0.12);
+  --think-dot: #F0C8A0;
+}
+.theme-cool {
+  --body-1: #F2F6FF; --body-2: #D8E4FF; --body-3: #A8C4E8;
+  --ear-1: #A8C4E8; --ear-2: #8FB0D8;
+  --antenna: #90B0D8; --antball-1: #64B5F6; --antball-2: #42A5F5;
+  --antglow: rgba(66,165,245,0.5); --antglow2: rgba(66,165,245,0.8);
+  --blush: rgba(130,177,255,0.35); --mouth: #6A8FB8;
+  --arm-1: #D8E4FF; --arm-2: #A8C4E8; --foot: #B8CCE8;
+  --pupil-1: #2C3E50; --pupil-2: #1A2530;
+  --shadow: rgba(100,130,180,0.18); --shadow-inner: rgba(100,120,160,0.12);
+  --think-dot: #A8C4E8;
+}
+.theme-blossom {
+  --body-1: #FFF0F4; --body-2: #FFD6E0; --body-3: #F0A8B8;
+  --ear-1: #F0A8B8; --ear-2: #E890A0;
+  --antenna: #E898A8; --antball-1: #F48FB1; --antball-2: #EC407A;
+  --antglow: rgba(236,64,122,0.5); --antglow2: rgba(236,64,122,0.8);
+  --blush: rgba(255,150,170,0.5); --mouth: #C07080;
+  --arm-1: #FFD6E0; --arm-2: #F0A8B8; --foot: #E8B0B8;
+  --pupil-1: #4A2838; --pupil-2: #2A1020;
+  --shadow: rgba(200,100,120,0.18); --shadow-inner: rgba(200,90,110,0.12);
+  --think-dot: #F0A8B8;
+}
+.theme-forest {
+  --body-1: #F4FAF0; --body-2: #D8F0D0; --body-3: #A0D8A0;
+  --ear-1: #A0D8A0; --ear-2: #80C080;
+  --antenna: #90C090; --antball-1: #81C784; --antball-2: #4CAF50;
+  --antglow: rgba(76,175,80,0.5); --antglow2: rgba(76,175,80,0.8);
+  --blush: rgba(130,200,130,0.35); --mouth: #5A8A5A;
+  --arm-1: #D8F0D0; --arm-2: #A0D8A0; --foot: #B0D8B0;
+  --pupil-1: #2C4028; --pupil-2: #1A2810;
+  --shadow: rgba(100,160,100,0.18); --shadow-inner: rgba(80,140,80,0.12);
+  --think-dot: #A0D8A0;
+}
+.theme-midnight {
+  --body-1: #F5F0FA; --body-2: #E0D0F0; --body-3: #B8A0D8;
+  --ear-1: #B8A0D8; --ear-2: #A080C8;
+  --antenna: #A890C8; --antball-1: #BA68C8; --antball-2: #9C27B0;
+  --antglow: rgba(156,39,176,0.5); --antglow2: rgba(156,39,176,0.8);
+  --blush: rgba(180,140,210,0.40); --mouth: #7A60A0;
+  --arm-1: #E0D0F0; --arm-2: #B8A0D8; --foot: #C0A8D8;
+  --pupil-1: #382848; --pupil-2: #201030;
+  --shadow: rgba(140,100,180,0.18); --shadow-inner: rgba(130,80,160,0.12);
+  --think-dot: #B8A0D8;
+}
+
+/* ═══════════════════════════════════════════
+   基础
+   ═══════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:transparent;overflow:hidden;user-select:none;-webkit-user-select:none;font-family:"Segoe UI","Microsoft YaHei",sans-serif;-webkit-transform:translateZ(0);transform:translateZ(0)}
+
+/* ═══════════════════════════════════════════
+   场景
+   ═══════════════════════════════════════════ */
+.scene{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;padding-bottom:30px;transition:opacity .3s;overflow:visible}
+
+/* ═══════════════════════════════════════════
+   气泡
+   ═══════════════════════════════════════════ */
+.bubble-wrap{position:absolute;top:-18px;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none}
+.bubble{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);color:#3d2c1e;padding:8px 16px;border-radius:16px;font-size:13px;font-weight:500;white-space:nowrap;max-width:240px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.1);position:relative;opacity:0;transform:translateY(8px) scale(.9);transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.bubble.show{opacity:1;transform:translateY(0) scale(1)}
+.bubble::after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:12px;height:8px;background:rgba(255,255,255,.92);clip-path:polygon(0 0,100% 0,50% 100%)}
+
+/* ═══════════════════════════════════════════
+   麻薯专属 — 精绘 CSS 宠物
+   ═══════════════════════════════════════════ */
+.pet-container{position:relative;width:180px;height:200px;cursor:grab;transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .3s;z-index:5;overflow:visible}
+.pet-container.dragging{cursor:grabbing}
+
+.shadow{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:90px;height:18px;background:radial-gradient(ellipse,rgba(0,0,0,.15),transparent);border-radius:50%;transition:all .6s;pointer-events:none}
+
+.body{position:absolute;width:124px;height:118px;top:48px;left:50%;transform:translateX(-50%);background:radial-gradient(circle at 38% 32%,var(--body-1) 0%,var(--body-2) 55%,var(--body-3) 100%);border-radius:50%;box-shadow:0 10px 36px var(--shadow),inset 0 -5px 14px var(--shadow-inner),inset 0 5px 10px rgba(255,255,255,.55),0 0 0 3px rgba(255,255,255,.25);transition:all .4s;pointer-events:none}
+
+.ears{position:absolute;top:34px;left:50%;transform:translateX(-50%);width:104px;height:28px;pointer-events:none}
+.ear{position:absolute;width:22px;height:26px;background:radial-gradient(circle at 50% 65%,var(--ear-1),var(--ear-2));border-radius:55% 55% 35% 35%;box-shadow:inset 0 2px 5px rgba(255,255,255,.5);transition:transform .3s;pointer-events:none}
+.ear.left{left:16px;transform:rotate(-12deg)}
+.ear.right{right:16px;transform:rotate(12deg)}
+
+.antenna{position:absolute;top:36px;left:50%;width:3.5px;height:24px;background:linear-gradient(to top,var(--antenna),var(--antball-1));border-radius:2px;transform:translateX(-50%);transform-origin:bottom center;transition:transform .3s;pointer-events:none}
+.antenna-ball{position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:14px;height:14px;background:radial-gradient(circle at 35% 32%,var(--antball-1),var(--antball-2) 80%);border-radius:50%;box-shadow:0 0 10px var(--antglow),0 0 20px var(--antglow),inset 0 1px 2px rgba(255,255,255,.4);transition:all .4s;pointer-events:none}
+
+.eyes{position:absolute;top:78px;left:50%;transform:translateX(-50%);width:72px;height:30px;pointer-events:none}
+.eye{position:absolute;width:28px;height:30px;background:white;border-radius:50%;box-shadow:inset 0 2px 4px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.05);overflow:hidden;transition:transform .2s;pointer-events:none}
+.eye.left{left:0}.eye.right{right:0}
+.pupil{position:absolute;width:13px;height:14px;background:radial-gradient(circle at 38% 38%,var(--pupil-1),var(--pupil-2));border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);transition:all .25s;pointer-events:none}
+.pupil::after{content:'';position:absolute;top:1.5px;left:3px;width:5px;height:5px;background:white;border-radius:50%}
+.eye::after{content:'';position:absolute;bottom:5px;right:5px;width:4px;height:4px;background:rgba(255,255,255,.7);border-radius:50%}
+
+.blush{position:absolute;width:20px;height:13px;background:var(--blush);border-radius:50%;top:98px;filter:blur(2px);transition:all .4s;pointer-events:none}
+.blush.left{left:26px}.blush.right{right:26px}
+
+.mouth{position:absolute;top:108px;left:50%;transform:translateX(-50%);width:16px;height:8px;border-bottom:2px solid var(--mouth);border-radius:0 0 50% 50%;transition:all .3s;pointer-events:none}
+
+.arm{position:absolute;width:18px;height:24px;background:radial-gradient(circle at 50% 25%,var(--arm-1),var(--arm-2));border-radius:50%;top:108px;transition:all .4s;transform-origin:top center;pointer-events:none}
+.arm.left{left:20px}.arm.right{right:20px}
+
+.foot{position:absolute;width:20px;height:12px;background:var(--foot);border-radius:50%;bottom:50px;transition:transform .4s;box-shadow:inset 0 2px 3px rgba(255,255,255,.3);pointer-events:none}
+.foot.left{left:40px}.foot.right{right:40px}
+
+/* ═══════════════════════════════════════════
+   角色容器 — SVG 自带眼睛嘴巴, 无需覆盖层
+   ═══════════════════════════════════════════ */
+.char-wrap{position:absolute;top:28px;left:50%;transform:translateX(-50%);width:130px;height:138px;z-index:3;overflow:visible;pointer-events:none}
+.char-wrap *{pointer-events:none}
+.char-svg{width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(0,0,0,.15))}
+.char-wrap svg{overflow:visible}
+.char-css{/* 角色专属动画注入点 */}
+
+/* 角色眼睛跟随状态 */
+.pet-container.state-thinking .char-pupil{transform:translate(-50%,-75%)}
+.pet-container.state-processing .char-pupil{transform:translate(-30%,-50%)}
+.pet-container.state-waiting_permission .char-pupil{transform:translate(-50%,-50%) scale(1.15)}
+.pet-container.state-error .char-eye{transform:scaleY(.1)}
+.char-picker{max-height:220px;overflow-y:auto}
+.char-picker .item{font-size:12px;gap:8px}
+.char-picker .item .preview{font-size:18px;width:22px;text-align:center}
+.char-picker .item.active{background:rgba(255,140,66,.18);font-weight:600}
+
+/* ═══════════════════════════════════════════
+   粒子 / 特效元素
+   ═══════════════════════════════════════════ */
+.particles{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.particle{position:absolute;font-size:14px;animation:particle-float 1.5s ease-out forwards;opacity:0}
+@keyframes particle-float{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+
+.think-dots{position:absolute;top:-20px;left:50%;transform:translateX(-50%);display:flex;gap:5px;pointer-events:none;z-index:8;opacity:0;transition:opacity .3s}
+.think-dots.active{opacity:1}
+.think-dot{width:7px;height:7px;background:var(--think-dot);border-radius:50%;animation:dot-bounce 1.2s ease-in-out infinite}
+.think-dot:nth-child(2){animation-delay:.2s}.think-dot:nth-child(3){animation-delay:.4s}
+@keyframes dot-bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-10px);opacity:1}}
+
+.tool-icon{position:absolute;top:-15px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:8;font-size:18px;opacity:0;transition:all .3s}
+.tool-icon.active{opacity:1;animation:tool-bob .6s ease-in-out infinite}
+@keyframes tool-bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+
+.question-mark{position:absolute;top:138px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:8;font-size:24px;opacity:0;transition:all .3s}
+.question-mark.active{opacity:1;animation:question-pop 1s ease-in-out infinite}
+@keyframes question-pop{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.3)}}
+
+.sleep-zzz{position:absolute;top:138px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:8;font-size:16px;color:var(--mouth);opacity:0;transition:opacity .5s}
+.sleep-zzz.active{opacity:.7;animation:float-up 2s ease-out infinite}
+@keyframes float-up{0%{transform:translateX(30px) translateY(0);opacity:.8}100%{transform:translateX(50px) translateY(-25px);opacity:0}}
+
+/* ═══════════════════════════════════════════
+   吸附指示器
+   ═══════════════════════════════════════════ */
+.snap-indicator{position:fixed;top:6px;right:6px;font-size:11px;background:rgba(0,0,0,.5);color:#fff;padding:2px 8px;border-radius:10px;pointer-events:none;z-index:99;display:none;transition:opacity .3s}
+
+/* ═══════════════════════════════════════════
+   新增动画 — 眨眼
+   ═══════════════════════════════════════════ */
+.pet-container.blink .eye{animation:blink-anim .15s ease-in-out}
+@keyframes blink-anim{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.05)}}
+
+/* ═══════════════════════════════════════════
+   打哈欠 — 嘴巴张大 + 眼睛闭合 + 手臂伸展
+   ═══════════════════════════════════════════ */
+.pet-container.yawning .mouth{width:26px;height:18px;border-radius:50%;border:2.5px solid var(--mouth);border-top-color:transparent;top:108px}
+.pet-container.yawning .eye{transform:scaleY(.15)}
+.pet-container.yawning .arm.left{transform:translateY(-16px) rotate(-35deg)}
+.pet-container.yawning .arm.right{transform:translateY(-16px) rotate(35deg)}
+.pet-container.yawning .blush{transform:scale(1.4)}
+.pet-container.yawning .antenna{transform:translateX(-50%) rotate(-15deg)}
+
+/* ═══════════════════════════════════════════
+   伸懒腰 — 身体拉长 + 手臂上举
+   ═══════════════════════════════════════════ */
+.pet-container.stretching .body{animation:stretch-body 1.5s ease-in-out}
+@keyframes stretch-body{0%,100%{transform:translateX(-50%) scale(1,1)}30%{transform:translateX(-50%) scale(.95,1.08)}60%{transform:translateX(-50%) scale(1.02,.95)}}
+.pet-container.stretching .arm.left{transform:translateY(-20px) rotate(-40deg)}
+.pet-container.stretching .arm.right{transform:translateY(-20px) rotate(40deg)}
+.pet-container.stretching .eyes{animation:eye-squint .3s ease-in-out 2}
+.pet-container.stretching .foot{transform:translateY(-4px)}
+
+/* ═══════════════════════════════════════════
+   开心扭动 — Claude 成功完成任务后
+   ═══════════════════════════════════════════ */
+.pet-container.wobble .body{animation:wobble-anim .5s ease-in-out}
+@keyframes wobble-anim{0%,100%{transform:translateX(-50%) rotate(0)}25%{transform:translateX(-50%) rotate(-8deg)}75%{transform:translateX(-50%) rotate(8deg)}}
+.pet-container.wobble .mouth{border-bottom:none;border:2.5px solid var(--mouth);border-top-color:transparent;border-radius:50%;width:18px;height:14px;top:107px}
+.pet-container.wobble .antenna-ball{box-shadow:0 0 18px var(--antglow2)}
+
+/* ═══════════════════════════════════════════
+   状态动画
+   ═══════════════════════════════════════════ */
+.pet-container.state-idle .body{animation:breathe 3.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translateX(-50%) scale(1)}48%{transform:translateX(-50%) scale(1.05,.965)}52%{transform:translateX(-50%) scale(1.05,.965)}}
+.pet-container.state-idle .antenna{animation:antenna-idle 4.5s ease-in-out infinite}
+@keyframes antenna-idle{0%,100%{transform:translateX(-50%) rotate(0)}20%{transform:translateX(-50%) rotate(-10deg)}50%{transform:translateX(-50%) rotate(6deg)}75%{transform:translateX(-50%) rotate(-4deg)}}
+.pet-container.state-idle .antenna-ball{animation:ball-glow 2s ease-in-out infinite}
+@keyframes ball-glow{0%,100%{box-shadow:0 0 10px var(--antglow),0 0 20px var(--antglow)}50%{box-shadow:0 0 16px var(--antglow2),0 0 28px var(--antglow)}}
+
+.pet-container.state-thinking .pupil{transform:translate(-50%,-70%) scale(1.05)}
+.pet-container.state-thinking .antenna{animation:antenna-active .5s ease-in-out infinite}
+@keyframes antenna-active{0%,100%{transform:translateX(-50%) rotate(-14deg)}50%{transform:translateX(-50%) rotate(14deg)}}
+.pet-container.state-thinking .antenna-ball{box-shadow:0 0 18px var(--antglow2),0 0 30px var(--antglow);background:radial-gradient(circle at 35% 35%,var(--antball-1),var(--antball-2))}
+.pet-container.state-thinking .arm.left{transform:translateY(-4px) rotate(-8deg)}
+.pet-container.state-thinking .arm.right{transform:translateY(-4px) rotate(8deg)}
+
+.pet-container.state-tool_use .body{animation:work-shake .3s ease-in-out infinite}
+@keyframes work-shake{0%,100%{transform:translateX(-50%) translateX(0)}25%{transform:translateX(-50%) translateX(-3px)}75%{transform:translateX(-50%) translateX(3px)}}
+.pet-container.state-tool_use .arm.left{transform:translateY(-12px) rotate(-25deg)}
+.pet-container.state-tool_use .arm.right{transform:translateY(-12px) rotate(25deg)}
+.pet-container.state-tool_use .eyes{animation:eye-squint .3s ease-in-out infinite}
+@keyframes eye-squint{0%,100%{transform:translateX(-50%) scaleY(1)}50%{transform:translateX(-50%) scaleY(.7)}}
+
+.pet-container.state-processing .antenna{animation:antenna-spin 1s linear infinite}
+@keyframes antenna-spin{0%{transform:translateX(-50%) rotate(0)}100%{transform:translateX(-50%) rotate(360deg)}}
+.pet-container.state-processing .pupil{transform:translate(-30%,-50%)}
+.pet-container.state-processing .antenna-ball{background:radial-gradient(circle at 35% 35%,#81C784,#4CAF50);box-shadow:0 0 10px rgba(76,175,80,.5)}
+.pet-container.state-processing .body{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.03)}}
+
+.pet-container.state-waiting_permission .eye{transform:scale(1.2)}
+.pet-container.state-waiting_permission .pupil{transform:translate(-50%,-50%) scale(1.1)}
+.pet-container.state-waiting_permission .arm.left{transform:translateY(-3px) rotate(-5deg)}
+.pet-container.state-waiting_permission .arm.right{transform:translateY(-3px) rotate(5deg)}
+.pet-container.state-waiting_permission .mouth{width:14px;height:8px;border-radius:50%;border-bottom:none;border:2.5px solid var(--mouth);border-top:none;top:112px}
+
+.pet-container.state-session_start{animation:pop-in .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop-in{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+
+.pet-container.state-session_end{animation:fade-out .8s ease-in forwards}
+@keyframes fade-out{0%{transform:scale(1);opacity:1}60%{transform:scale(1.1);opacity:.8}100%{transform:scale(.3);opacity:0}}
+
+.pet-container.state-compacting .body{animation:compact 1s ease-in-out infinite}
+@keyframes compact{0%,100%{transform:translateX(-50%) scale(1,1)}50%{transform:translateX(-50%) scale(.85,1.15)}}
+
+.pet-container.state-subagent_start .body{animation:split-hint .8s ease-in-out infinite}
+@keyframes split-hint{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(.9);box-shadow:0 8px 32px var(--shadow),30px 0 0 rgba(255,224,204,.5)}}
+
+.pet-container.state-error{animation:shake .5s ease-in-out}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.pet-container.state-error .mouth{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--mouth);border-top:none;top:107px}
+.pet-container.state-error .blush{opacity:0}
+
+/* ═══════════════════════════════════════════
+   右键菜单
+   ═══════════════════════════════════════════ */
+.context-menu{position:fixed;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.15);padding:6px 0;min-width:155px;max-height:320px;overflow-y:auto;z-index:999;display:none;font-size:13px}
+.context-menu::-webkit-scrollbar{width:4px}
+.context-menu::-webkit-scrollbar-track{background:transparent}
+.context-menu::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:2px}
+.context-menu::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25)}
+.context-menu.show{display:block}
+.context-menu .item{padding:8px 16px;cursor:pointer;color:#3d2c1e;transition:background .15s;display:flex;align-items:center;gap:6px}
+.context-menu .item:hover{background:rgba(255,140,66,.12)}
+.context-menu .item.danger{color:#d32f2f}
+.context-menu .item .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.context-menu .divider{height:1px;background:rgba(0,0,0,.08);margin:4px 0}
+.context-menu .submenu{position:relative}
+.context-menu .submenu-arrow{position:absolute;right:12px}
+.context-menu .sub-list{display:none;padding:0 0 4px 0;margin:0 8px;border-left:2px solid rgba(255,140,66,.3)}
+.context-menu .sub-list.open{display:block}
+.context-menu .sub-list .item{padding:5px 12px;font-size:12px;border-radius:6px}
+.context-menu .sub-list .item:hover{background:rgba(255,140,66,.12)}
+.context-menu .submenu{position:relative;cursor:pointer}
+.context-menu .submenu-arrow{position:absolute;right:12px;transition:transform .2s}
+.context-menu .submenu.open .submenu-arrow{transform:rotate(90deg)}
+
+/* ═══════════════════════════════════════════
+   状态灯
+   ═══════════════════════════════════════════ */
+.status-light{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:7px;height:7px;border-radius:50%;background:#ccc;transition:all .5s;z-index:6}
+.status-light.active{background:#4CAF50;box-shadow:0 0 6px rgba(76,175,80,.6)}
+.status-light.thinking{background:#FFB74D;box-shadow:0 0 6px rgba(255,183,77,.6)}
+.status-light.working{background:#FF8C42;box-shadow:0 0 6px rgba(255,140,66,.6)}
+.status-light.waiting{background:#FFD54F;box-shadow:0 0 8px rgba(255,213,79,.7);animation:light-pulse .8s ease-in-out infinite}
+@keyframes light-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<div class="scene theme-warm" id="scene">
+
+  <!-- 粒子 -->
+  <div class="particles" id="particles"></div>
+
+  <!-- 吸附指示器 -->
+  <div class="snap-indicator" id="snapIndicator">🧲</div>
+
+  <!-- 角色容器 (气泡/特效/宠物 全绑在一起) -->
+  <div class="pet-container state-idle" id="petContainer">
+    <!-- 思考点 -->
+    <div class="think-dots" id="thinkDots">
+      <div class="think-dot"></div><div class="think-dot"></div><div class="think-dot"></div>
+    </div>
+    <!-- 工具图标 -->
+    <div class="tool-icon" id="toolIcon">🔧</div>
+    <!-- 问号 -->
+    <div class="question-mark" id="questionMark">❓</div>
+    <!-- Zzz -->
+    <div class="sleep-zzz" id="sleepZzz">💤</div>
+    <!-- 气泡 (在 pet-container 内部, 物理绑定) -->
+    <div class="bubble-wrap"><div class="bubble" id="bubble"></div></div>
+    <div class="char-wrap" id="charWrap"></div>
+    <div class="shadow"></div>
+  </div>
+
+  <div class="status-light" id="statusLight"></div>
+
+  <!-- 右键菜单 -->
+  <div class="context-menu" id="contextMenu">
+    <div class="item" data-action="about">🐱 关于 Claude Pet</div>
+    <div class="divider"></div>
+    <div class="item label" style="color:#999;font-size:11px;cursor:default">🎭 切换角色</div>
+    <div id="charPickerInline" style="max-height:130px;overflow-y:auto"></div>
+    <div class="divider"></div>
+    <div class="item" data-action="passthrough">🔒 开启穿透</div>
+    <div class="item" data-action="snap" id="snapMenuItem">🧲 吸附: 开</div>
+    <div class="item" data-action="reset">📍 重置位置</div>
+    <div class="item" data-action="hide">👀 隐藏 10 秒</div>
+    <div class="divider"></div>
+    <div class="item danger" data-action="quit">🚪 退出</div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DOM 引用
+   ═══════════════════════════════════════════ */
+const scene=document.getElementById('scene'),petContainer=document.getElementById('petContainer'),
+  bubble=document.getElementById('bubble'),thinkDots=document.getElementById('thinkDots'),
+  toolIcon=document.getElementById('toolIcon'),questionMark=document.getElementById('questionMark'),
+  sleepZzz=document.getElementById('sleepZzz'),statusLight=document.getElementById('statusLight'),
+  particles=document.getElementById('particles'),contextMenu=document.getElementById('contextMenu'),
+  snapIndicator=document.getElementById('snapIndicator'),snapMenuItem=document.getElementById('snapMenuItem');
+
+/* ═══════════════════════════════════════════
+   角色系统
+   ═══════════════════════════════════════════ */
+const charWrap=document.getElementById('charWrap');
+const charPicker=document.getElementById('charPickerInline');
+let currentChar='cat';
+
+function buildCharPicker(){
+  charPicker.innerHTML='';
+  Object.entries(CHARACTERS).forEach(([id,c])=>{
+    if(id==='default')return;
+    const div=document.createElement('div');
+    div.className='item'+(id===currentChar?' active':'');
+    div.dataset.action='char-'+id;
+    div.innerHTML=`<span class="preview">${c.emoji}</span> ${c.name}`;
+    div.addEventListener('click',e=>{e.stopPropagation();switchCharacter(id);contextMenu.classList.remove('show');contextMenu.style.display='none';});
+    charPicker.appendChild(div);
+  });
+  // "设为默认" 按钮
+  const setDef=document.createElement('div');
+  setDef.className='item';setDef.style.cssText='color:#FF8C42;font-weight:600;border-top:1px solid rgba(0,0,0,.06);margin-top:2px;padding-top:7px';
+  setDef.innerHTML='⭐ 设为默认角色';
+  setDef.addEventListener('click',e=>{e.stopPropagation();if(window.claudePet)window.claudePet.setDefaultChar(currentChar);contextMenu.classList.remove('show');contextMenu.style.display='none';showBubble('⭐ 默认角色已设置!',2000);});
+  charPicker.appendChild(setDef);
+}
+
+function renderCharacter(id){
+  const c=CHARACTERS[id]||CHARACTERS.mochi;
+  currentChar=id;
+
+  // 注入角色专属 CSS
+  let styleEl=document.getElementById('char-css');
+  if(!styleEl){styleEl=document.createElement('style');styleEl.id='char-css';document.head.appendChild(styleEl);}
+  styleEl.textContent=c.css||'';
+
+  // 渲染: SVG 角色 vs HTML 角色 (麻薯)
+  if(c.html){
+    charWrap.innerHTML=c.html;
+    charWrap.querySelector('.char-svg')?.remove(); // 清理旧 SVG
+  } else {
+    charWrap.innerHTML=c.svg;
+  }
+
+  // 主题仅对 themed 角色生效
+  if(c.themed&&window._currentTheme){
+    THEMES.forEach(x=>scene.classList.remove('theme-'+x));
+    scene.classList.add('theme-'+window._currentTheme);
+  } else {
+    THEMES.forEach(x=>scene.classList.remove('theme-'+x));
+  }
+
+  buildCharPicker();
+  updateTrayThemeVisibility();
+}
+
+// 切换角色
+function switchCharacter(id){
+  if(!CHARACTERS[id]||id==='default')return;
+  renderCharacter(id);
+  if(window.claudePet)window.claudePet.setCharacter(id);
+  const c=CHARACTERS[id];
+  showBubble(`${c.emoji} 切换为 ${c.name}!`,2000);
+  spawnParticles([c.emoji,c.emoji,'✨'],6);
+}
+
+/* ═══════════════════════════════════════════
+   状态映射
+   ═══════════════════════════════════════════ */
+const STATE_MAP={
+  session_start:{class:'session_start',bubble:'✨ 我来了!',dur:2500,particles:['✨','🌟','💫','⭐'],light:'active'},
+  thinking:{class:'thinking',bubble:'让我想想... 🤔',dur:3000,dots:true,light:'thinking'},
+  tool_use:{class:'tool_use',light:'working'},
+  processing:{class:'processing',light:'thinking'},
+  waiting_permission:{class:'waiting_permission',bubble:'可以帮帮我吗? 👉👈',dur:4000,question:true,light:'waiting'},
+  idle:{class:'idle',light:''},
+  session_end:{class:'session_end',bubble:'下次见~ 👋',dur:3000,particles:['👋','💨'],light:''},
+  compacting:{class:'compacting',bubble:'整理记忆中... 🧹',dur:2500,light:'thinking'},
+  subagent_start:{class:'subagent_start',bubble:'派小弟去干活! 🚀',dur:2500,particles:['🚀','💨'],light:'working'},
+  error:{class:'error',bubble:'啊哦, 出错了! 😰',dur:3500,particles:['💥','❗'],light:'working'},
+};
+const TOOL_META={
+  Bash:{emoji:'💻',text:'跑代码中...'},Read:{emoji:'📖',text:'读文件中...'},
+  Write:{emoji:'✍️',text:'写文件中...'},Edit:{emoji:'✂️',text:'修改中...'},
+  Glob:{emoji:'🔍',text:'搜索文件中...'},Grep:{emoji:'🔎',text:'搜索内容中...'},
+  WebSearch:{emoji:'🌐',text:'搜索网页中...'},WebFetch:{emoji:'📥',text:'获取网页中...'},
+  Task:{emoji:'📋',text:'创建任务中...'},NotebookEdit:{emoji:'📓',text:'编辑 Notebook...'},
+};
+const IDLE_MSGS=['Zzz... 💤','今天天气不错~','Claude 在等你哦','有什么我可以帮忙的吗?','盯... 👀','好无聊啊~','想吃代码...🍕','你的代码真好看 ✨'];
+
+let currentState='idle',bubbleClearTimer=null,hideTimer=null,idleBubbleTimer=null;
+let passthroughMode=false,snapActive=false,idleAnimTimers=[];
+
+/* ═══════════════════════════════════════════
+   特效
+   ═══════════════════════════════════════════ */
+function clearEffects(){
+  thinkDots.classList.remove('active');toolIcon.classList.remove('active');
+  questionMark.classList.remove('active');sleepZzz.classList.remove('active');
+  statusLight.className='status-light';particles.innerHTML='';
+}
+function spawnParticles(emojis,n=8){
+  if(!emojis||!emojis.length)return;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('span');p.className='particle';
+    p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    const a=Math.random()*Math.PI*2,d=30+Math.random()*50;
+    p.style.setProperty('--dx',Math.cos(a)*d+'px');p.style.setProperty('--dy',Math.sin(a)*d-20+'px');
+    p.style.left=(90+Math.random()*20)+'px';p.style.top=(60+Math.random()*40)+'px';
+    p.style.animationDuration=(.8+Math.random()*1.2)+'s';p.style.animationDelay=Math.random()*.2+'s';
+    particles.appendChild(p);
+    setTimeout(()=>{if(p.parentNode)p.remove();},1800);
+  }
+}
+function showBubble(text,dur=3000){
+  if(!text){hideBubble();return}
+  bubble.textContent=text;bubble.classList.add('show');
+  if(bubbleClearTimer)clearTimeout(bubbleClearTimer);
+  if(dur>0)bubbleClearTimer=setTimeout(hideBubble,dur);
+}
+function hideBubble(){bubble.classList.remove('show');if(bubbleClearTimer)clearTimeout(bubbleClearTimer)}
+
+/* ═══════════════════════════════════════════
+   空闲动画 (眨眼 → 伸懒腰 → 打哈欠)
+   ═══════════════════════════════════════════ */
+function clearIdleAnims(){idleAnimTimers.forEach(t=>clearTimeout(t));idleAnimTimers=[]}
+function schedBlink(){
+  if(currentState!=='idle')return;
+  const t=setTimeout(()=>{
+    petContainer.classList.add('blink');
+    setTimeout(()=>petContainer.classList.remove('blink'),180);
+    schedBlink();
+  },3000+Math.random()*6000);
+  idleAnimTimers.push(t);
+}
+function schedStretch(){
+  if(currentState!=='idle')return;
+  const t=setTimeout(()=>{
+    petContainer.classList.add('stretching');
+    setTimeout(()=>petContainer.classList.remove('stretching'),1600);
+    schedStretch();
+  },18000+Math.random()*25000);
+  idleAnimTimers.push(t);
+}
+function schedYawn(){
+  if(currentState!=='idle')return;
+  const t=setTimeout(()=>{
+    petContainer.classList.add('yawning');
+    setTimeout(()=>petContainer.classList.remove('yawning'),2200);
+    schedYawn();
+  },30000+Math.random()*40000);
+  idleAnimTimers.push(t);
+}
+function startIdleAnims(){clearIdleAnims();schedBlink();schedStretch();schedYawn()}
+
+/* ═══════════════════════════════════════════
+   空闲气泡
+   ═══════════════════════════════════════════ */
+function startIdleBubbles(){
+  stopIdleBubbles();if(currentState!=='idle')return;
+  idleBubbleTimer=setInterval(()=>{if(currentState!=='idle'){stopIdleBubbles();return}if(Math.random()<.3)showBubble(IDLE_MSGS[Math.floor(Math.random()*IDLE_MSGS.length)],2500)},8000);
+}
+function stopIdleBubbles(){if(idleBubbleTimer){clearInterval(idleBubbleTimer);idleBubbleTimer=null}}
+
+/* ═══════════════════════════════════════════
+   状态切换
+   ═══════════════════════════════════════════ */
+function setStatus(data){
+  const s=data.status||'idle',tool=data.tool||'';
+  if(s===currentState)return;currentState=s;
+  // 如果从非 idle 回到 idle，晃一下表示开心
+  if(s==='idle'&&currentState!=='idle'){
+    setTimeout(()=>{petContainer.classList.add('wobble');setTimeout(()=>petContainer.classList.remove('wobble'),600)},200);
+  }
+  const cfg=STATE_MAP[s]||STATE_MAP.idle;
+  clearEffects();hideBubble();stopIdleBubbles();clearIdleAnims();
+  Object.values(STATE_MAP).forEach(c=>{if(c.class)petContainer.classList.remove('state-'+c.class)});
+  petContainer.classList.add('state-'+(cfg.class||'idle'));
+  if(cfg.light==='active')statusLight.className='status-light active';
+  else if(cfg.light==='thinking')statusLight.className='status-light thinking';
+  else if(cfg.light==='working')statusLight.className='status-light working';
+  else if(cfg.light==='waiting')statusLight.className='status-light waiting';
+  else statusLight.className='status-light';
+  if(cfg.particles)spawnParticles(cfg.particles,cfg.particles.length>3?6:4);
+  if(cfg.dots)thinkDots.classList.add('active');
+  if(s==='tool_use'&&tool){const m=TOOL_META[tool]||{emoji:'⚙️',text:'工作中...'};toolIcon.textContent=m.emoji;toolIcon.classList.add('active');showBubble(m.text,0)}
+  if(cfg.question)questionMark.classList.add('active');
+  if(cfg.bubble)showBubble(cfg.bubble,cfg.dur||3000);
+  if(s==='idle'){startIdleBubbles();startIdleAnims()}
+  if(s==='session_end')setTimeout(()=>setStatus({status:'idle',tool:''}),4000);
+}
+
+/* ═══════════════════════════════════════════
+   IPC 监听
+   ═══════════════════════════════════════════ */
+if(window.claudePet){
+  window.claudePet.onStatusChange(d=>setStatus(d));
+  window.claudePet.onPassthroughChange(en=>{passthroughMode=en;petContainer.style.opacity=en?'.65':'1';petContainer.style.cursor=en?'default':'grab';updatePassthroughLabel()});
+  window.claudePet.onSnapPosition(d=>{snapActive=d.active;snapIndicator.style.display=d.active?'block':'none';snapIndicator.textContent='🧲 '+({top:'⬆',bottom:'⬇',left:'⬅',right:'➡'}[d.side]||'📌')});
+  window.claudePet.onThemeChange(t=>applyTheme(t));
+  window.claudePet.onCharacterChange(id=>{if(id&&CHARACTERS[id])renderCharacter(id)});
+  window.claudePet.getTheme().then(t=>{if(t)applyTheme(t)});
+  window.claudePet.getCharacter().then(id=>{
+    if(id&&CHARACTERS[id])renderCharacter(id);
+    else renderCharacter('cat');
+    buildCharPicker();
+  });
+} else {
+  // 开发模式
+  renderCharacter('cat');
+  buildCharPicker();
+}
+
+/* ═══════════════════════════════════════════
+   主题 (仅麻薯角色支持)
+   ═══════════════════════════════════════════ */
+const THEMES=['warm','cool','blossom','forest','midnight'];
+window._currentTheme='warm';
+function applyTheme(t){
+  if(!THEMES.includes(t))return;
+  window._currentTheme=t;
+  const c=CHARACTERS[currentChar]||CHARACTERS.mochi;
+  if(c.themed){
+    THEMES.forEach(x=>scene.classList.remove('theme-'+x));
+    scene.classList.add('theme-'+t);
+  }
+}
+function updateTrayThemeVisibility(){} // 占位 — main.js 通过 setCharacter 处理
+function updatePassthroughLabel(){
+  const el=contextMenu.querySelector('[data-action="passthrough"]');
+  if(el)el.textContent=passthroughMode?'🔓 关闭穿透':'🔒 开启穿透';
+}
+
+/* ═══════════════════════════════════════════
+   拖拽 — 跟踪窗口绝对位置
+   ═══════════════════════════════════════════ */
+let isDragging=false,hasMoved=false,startX=0,startY=0,winStartX=0,winStartY=0;
+let winX=0,winY=0;
+
+petContainer.addEventListener('mousedown',e=>{
+  if(e.button!==0||passthroughMode)return;
+  isDragging=true;hasMoved=false;
+  startX=e.screenX;startY=e.screenY;
+  winStartX=winX;winStartY=winY;
+  petContainer.classList.add('dragging');
+  e.preventDefault();e.stopPropagation();
+});
+document.addEventListener('mousemove',e=>{
+  if(!isDragging||passthroughMode)return;
+  if(Math.abs(e.screenX-startX)>2||Math.abs(e.screenY-startY)>2)hasMoved=true;
+  winX=winStartX+(e.screenX-startX);
+  winY=winStartY+(e.screenY-startY);
+  if(window.claudePet)window.claudePet.setWindowPos(winX,winY);
+});
+document.addEventListener('mouseup',e=>{
+  if(!isDragging)return;isDragging=false;
+  petContainer.classList.remove('dragging');
+  // 更新最终位置，确保下次拖拽起点正确
+  winX=winStartX+(e.screenX-startX);
+  winY=winStartY+(e.screenY-startY);
+  if(!hasMoved){
+    showBubble(['你好呀! 🐱','我在盯着 Claude 呢~','别戳我! >_<','喵~','可以拖着我走哦!'][Math.floor(Math.random()*5)],2000);
+  }
+});
+
+/* ═══════════════════════════════════════════
+   右键菜单
+   ═══════════════════════════════════════════ */
+document.addEventListener('contextmenu',e=>{
+  e.preventDefault();updatePassthroughLabel();
+  if(snapMenuItem)snapMenuItem.textContent='🧲 吸附: '+(snapActive?'开':'关');
+  // 先 invisible 渲染以测量尺寸
+  contextMenu.style.visibility='hidden';
+  contextMenu.style.display='block';
+  contextMenu.style.left='0';contextMenu.style.top='0';
+  const mw=contextMenu.offsetWidth,mh=contextMenu.offsetHeight;
+  // 计算不越界的位置 (向右展开, 不够则向左; 向下展开, 不够则向上)
+  let mx=e.clientX,my=e.clientY;
+  if(mx+mw>window.innerWidth-5)mx=e.clientX-mw;
+  if(my+mh>window.innerHeight-5)my=e.clientY-mh;
+  if(mx<0)mx=5;if(my<0)my=5;
+  contextMenu.style.left=mx+'px';contextMenu.style.top=my+'px';
+  contextMenu.style.visibility='visible';
+  contextMenu.classList.add('show');
+});
+document.addEventListener('click',e=>{if(!contextMenu.contains(e.target)){contextMenu.classList.remove('show');contextMenu.style.display='none'}});
+contextMenu.addEventListener('click',e=>{
+  const a=e.target.dataset.action,t=e.target.dataset.theme;
+  if(!a&&!t)return;contextMenu.classList.remove('show');contextMenu.style.display='none';
+  if(t&&a==='theme'){if(window.claudePet)window.claudePet.setTheme(t);applyTheme(t);showBubble('🎨 主题切换!',1500)}
+  // 展开/折叠子菜单
+  if(e.target.classList.contains('item')&&e.target.classList.contains('submenu')){
+    e.stopPropagation();e.target.classList.toggle('open');
+    const sl=e.target.querySelector('.sub-list');if(sl)sl.classList.toggle('open');
+    return;
+  }
+  switch(a){
+    case'passthrough':if(window.claudePet)window.claudePet.togglePassthrough();break;
+    case'snap':if(window.claudePet)window.claudePet.toggleSnapping();showBubble(snapActive?'吸附已关闭':'吸附已开启! 🧲',1500);break;
+    case'reset':showBubble('回到原位! 🏠',1500);break;
+    case'hide':showBubble('10秒后回来~ 😴',2000);scene.style.opacity='0';if(hideTimer)clearTimeout(hideTimer);hideTimer=setTimeout(()=>{scene.style.opacity='1'},10000);break;
+    case'quit':showBubble('再见! 👋',1000);setTimeout(()=>window.close(),1200);break;
+    case'about':showBubble('🐱 Claude Pet v1.1 — 主题/吸附/动画!',3000);break;
+  }
+});
+
+/* ═══════════════════════════════════════════
+   启动
+   ═══════════════════════════════════════════ */
+// 获取窗口初始位置，避免首次拖拽跳屏
+if(window.claudePet){window.claudePet.getWindowPos().then(p=>{winX=p.x;winY=p.y})}
+console.log('🐱 Claude Pet v1.2 已就绪!');
+console.log('  - 拖拽移动 | 右键菜单 | 5 套主题');
+console.log('  - 窗口吸附 | 眨眼/哈欠/伸懒腰');
+setTimeout(()=>{setStatus({status:'session_start'});setTimeout(()=>setStatus({status:'idle'}),3000)},500);
+</script>
+</body>
+</html>
