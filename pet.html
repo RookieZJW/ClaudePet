@@ -417,11 +417,78 @@ function spawnParticles(emojis,n=8){
     setTimeout(()=>{if(p.parentNode)p.remove();},1800);
   }
 }
+let voiceEnabled=true;
+let bestVoice=null;
+const SOUND_DIR='sounds/';
+// 预加载音频缓存
+const audioCache={};
+function getAudio(file){
+  if(!file)return null;
+  if(!audioCache[file]){const a=new Audio(SOUND_DIR+file);a.volume=0.85;audioCache[file]=a}
+  return audioCache[file];
+}
+// 播放 MP3 → 不存在则 TTS 兜底
+function playSound(file,fallbackText){
+  if(voiceEnabled&&file){const a=getAudio(file);if(a){a.currentTime=0;a.play().catch(()=>speak(fallbackText));return}}
+  if(fallbackText)speak(fallbackText);
+}
+// 消息 → MP3 映射表
+const MSG_SOUND={
+  '✨ 我来了!':'start.mp3','让我想想... 🤔':'thinking.mp3',
+  '可以帮帮我吗? 👉👈':'wait.mp3','下次见~ 👋':'bye.mp3',
+  '整理记忆中... 🧹':'compact.mp3','派小弟去干活! 🚀':'subagent.mp3',
+  '啊哦, 出错了! 😰':'error.mp3',
+  '跑代码中...':'tool_bash.mp3','读文件中...':'tool_read.mp3',
+  '写文件中...':'tool_write.mp3','修改中...':'tool_edit.mp3',
+  '搜索文件中...':'tool_glob.mp3','搜索内容中...':'tool_grep.mp3',
+  '搜索网页中...':'tool_web.mp3','获取网页中...':'tool_fetch.mp3',
+  '创建任务中...':'tool_task.mp3','编辑 Notebook...':'tool_nb.mp3',
+  '🎉 专注完成! 休息~':'pomo_done.mp3','☕ 休息结束!':'pomo_break.mp3',
+  '🔊 语音已开启':'voice_on.mp3','🔇 已静音':'voice_off.mp3',
+  'Zzz... 💤':'idle1.mp3','今天天气不错~':'idle2.mp3',
+  'Claude 在等你哦':'idle3.mp3','有什么我可以帮忙的吗?':'idle4.mp3',
+  '盯... 👀':'idle5.mp3','好无聊啊~':'idle6.mp3',
+  '想吃代码...🍕':'idle7.mp3','你的代码真好看 ✨':'idle8.mp3',
+  '你好呀! 🐱':'click1.mp3','我在盯着 Claude 呢~':'click2.mp3',
+  '别戳我! >_<':'click3.mp3','喵~':'click4.mp3','可以拖着我走哦!':'click5.mp3',
+};
+// TTS
+function pickVoice(){
+  const voices=speechSynthesis.getVoices();
+  if(!voices.length)return;
+  const pf=['Microsoft Xiaoxiao','Microsoft Yunxi','Google 普通话','Microsoft Huihui'];
+  for(const p of pf){const v=voices.find(v=>v.name.includes(p));if(v){bestVoice=v;return}}
+  bestVoice=voices.find(v=>v.lang.startsWith('zh'))||voices[0];
+}
+speechSynthesis.onvoiceschanged=pickVoice;pickVoice();
+function speak(text){
+  if(!voiceEnabled||!text||!window.speechSynthesis)return;
+  const u=new SpeechSynthesisUtterance(text);
+  if(bestVoice)u.voice=bestVoice;else u.lang='zh-CN';
+  u.rate=1.05;u.pitch=1.0;u.volume=0.85;
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+}
+// 按状态播放对应 MP3
+function playStateSound(status,tool){
+  const map={
+    session_start:'start.mp3',thinking:'thinking.mp3',
+    tool_use:'tool.mp3',processing:'working.mp3',
+    waiting_permission:'wait.mp3',idle:'idle.mp3',
+    session_end:'bye.mp3',compacting:'compact.mp3',
+    subagent_start:'subagent.mp3',
+  };
+  playSound(map[status],null);
+}
 function showBubble(text,dur=3000){
   if(!text){hideBubble();return}
   bubble.textContent=text;bubble.classList.add('show');
+  const sfx=MSG_SOUND[text];if(sfx)playSound(sfx,text);else speak(text);
   if(bubbleClearTimer)clearTimeout(bubbleClearTimer);
   if(dur>0)bubbleClearTimer=setTimeout(hideBubble,dur);
+}
+function toggleVoice(){
+  voiceEnabled=!voiceEnabled;speechSynthesis.cancel();
+  showBubble(voiceEnabled?'🔊 语音已开启':'🔇 已静音',2000);
 }
 function hideBubble(){bubble.classList.remove('show');if(bubbleClearTimer)clearTimeout(bubbleClearTimer)}
 
@@ -472,7 +539,9 @@ function stopIdleBubbles(){if(idleBubbleTimer){clearInterval(idleBubbleTimer);id
    ═══════════════════════════════════════════ */
 function setStatus(data){
   const s=data.status||'idle',tool=data.tool||'';
-  if(s===currentState)return;currentState=s;
+  if(s===currentState)return;
+  if(s!=='idle')playStateSound(s,tool);
+  currentState=s;
   // 如果从非 idle 回到 idle，晃一下表示开心
   if(s==='idle'&&currentState!=='idle'){
     setTimeout(()=>{petContainer.classList.add('wobble');setTimeout(()=>petContainer.classList.remove('wobble'),600)},200);
@@ -593,7 +662,7 @@ function updatePomo(d){
     else showBubble('☕ 休息结束!',3000);
   }
 }
-if(window.claudePet){window.claudePet.onPomoStatus(d=>updatePomo(d));window.claudePet.getPomo().then(d=>updatePomo(d));}
+if(window.claudePet){window.claudePet.onPomoStatus(d=>updatePomo(d));window.claudePet.getPomo().then(d=>updatePomo(d));window.claudePet.onTtsToggle(()=>toggleVoice())}
 
 /* ═══════════════════════════════════════════
    启动

@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld("claudePet", {
   pomoStart: (s, p) => ipcRenderer.send("pomo-start", { seconds: s, phase: p }),
   pomoStop: () => ipcRenderer.send("pomo-stop"),
   onPomoStatus: (cb) => ipcRenderer.on("pomo-status", (e, d) => cb(d)),
+  onTtsToggle: (cb) => ipcRenderer.on("tts-toggle", () => cb()),
   showContextMenu: (d) => ipcRenderer.send("show-context-menu", d),
   getPomo: () => ipcRenderer.invoke("get-pomo"),
 

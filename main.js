@@ -396,7 +396,8 @@ ipcMain.on("show-context-menu", (e, { charId }) => {
   const charMenu = Object.entries({
     mochi:"🍡 小麻薯",cat:"🐱 小橘猫",dog:"🐶 小柯基",bunny:"🐰 小白兔",
     duck:"🦆 小黄鸭",swan:"🦢 小天鹅",pony:"🐴 小棕马",
-    ironman:"🦸 钢铁侠",thanos:"💜 灭霸"
+    panda:"🐼 小熊猫",penguin:"🐧 小企鹅",fox:"🦊 小狐狸",
+    frog:"🐸 小青蛙",pig:"🐷 小猪猪",ironman:"🦸 钢铁侠",thanos:"💜 灭霸"
   }).map(([id,name]) => ({ label: (id===charId?"✔ ":"  ")+name, click: () => setCharacter(id) }));
   const themeMenu = currentCharacter==="mochi" ? ["warm","cool","blossom","forest","midnight"].map(t => ({
     label: (currentTheme===t?"✔ ":"  ")+themeLabel(t), click: () => setTheme(t)
@@ -413,6 +414,7 @@ ipcMain.on("show-context-menu", (e, { charId }) => {
     { type: "separator" }, ...pomoItems, { type: "separator" },
     { label: "👆 穿透模式", type: "checkbox", checked: isPassthrough, click: () => togglePassthrough() },
     { label: "🧲 窗口吸附", type: "checkbox", checked: snapEnabled, click: () => toggleSnapping() },
+    { label: "🔊 语音播报", click: () => { mainWindow.webContents.send("tts-toggle"); } },
     { label: "📍 重置位置", click: () => { const {width:sw,height:sh}=screen.getPrimaryDisplay().workArea; mainWindow.setPosition(sw-PET_W-40,sh-PET_H-40); } },
     { label: "🚪 退出", click: () => app.quit() },
   ];

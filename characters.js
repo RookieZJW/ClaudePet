@@ -447,6 +447,239 @@ const CHARACTERS = {
 @keyframes gemFast{0%,100%{opacity:.5}50%{opacity:1}}
 `,
   },
+
+  /* ═══════════════════════════════════════════════
+     🐼 熊猫 — 黑白团子 + 黑眼圈 + 竹叶
+     ═══════════════════════════════════════════════ */
+  panda: {
+    name: "小熊猫", emoji: "🐼",
+    svg: `<svg viewBox="0 0 120 130">
+  <defs><radialGradient id="pandaBody"><stop offset="0%" stop-color="#FAFAFA"/><stop offset="100%" stop-color="#E0E0E0"/></radialGradient></defs>
+  <!-- 身体 -->
+  <ellipse cx="60" cy="98" rx="32" ry="26" fill="white"/>
+  <ellipse cx="60" cy="98" rx="32" ry="26" fill="url(#pandaBody)"/>
+  <!-- 腿 -->
+  <ellipse cx="40" cy="118" rx="14" ry="10" fill="#1A1A1A"/>
+  <ellipse cx="80" cy="118" rx="14" ry="10" fill="#1A1A1A"/>
+  <!-- 手 -->
+  <ellipse id="pd-armL" cx="26" cy="96" rx="12" ry="16" fill="#1A1A1A" transform="rotate(-20,26,96)"/>
+  <ellipse id="pd-armR" cx="94" cy="96" rx="12" ry="16" fill="#1A1A1A" transform="rotate(20,94,96)"/>
+  <!-- 耳朵 -->
+  <circle id="pd-earL" cx="24" cy="30" r="14" fill="#1A1A1A"/>
+  <circle id="pd-earR" cx="96" cy="30" r="14" fill="#1A1A1A"/>
+  <!-- 脸 -->
+  <ellipse cx="60" cy="56" rx="40" ry="36" fill="white"/>
+  <!-- 黑眼圈 -->
+  <ellipse id="pd-patchL" cx="44" cy="54" rx="14" ry="12" fill="#1A1A1A" transform="rotate(-10,44,54)"/>
+  <ellipse id="pd-patchR" cx="76" cy="54" rx="14" ry="12" fill="#1A1A1A" transform="rotate(10,76,54)"/>
+  <!-- 眼睛 -->
+  <circle id="pd-eyeL" cx="44" cy="54" r="5" fill="white"/>
+  <circle id="pd-eyeR" cx="76" cy="54" r="5" fill="white"/>
+  <circle id="pd-pupL" cx="45" cy="55" r="3" fill="#111"/>
+  <circle id="pd-pupR" cx="77" cy="55" r="3" fill="#111"/>
+  <circle cx="46" cy="53" r="1.2" fill="white"/>
+  <circle cx="78" cy="53" r="1.2" fill="white"/>
+  <!-- 鼻子 -->
+  <ellipse cx="60" cy="66" rx="5" ry="3.5" fill="#333"/>
+  <!-- 嘴 -->
+  <path d="M56,70 Q60,74 64,70" fill="none" stroke="#555" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- 腮红 -->
+  <circle cx="32" cy="62" r="6" fill="rgba(255,180,180,.35)"/>
+  <circle cx="88" cy="62" r="6" fill="rgba(255,180,180,.35)"/>
+  <!-- 竹叶 -->
+  <ellipse cx="22" cy="82" rx="4" ry="12" fill="#4CAF50" transform="rotate(30,22,82)" opacity=".7"/>
+  <ellipse cx="16" cy="78" rx="3" ry="10" fill="#66BB6A" transform="rotate(-15,16,78)" opacity=".6"/>
+</svg>`,
+    css: `
+.state-idle #pd-armL{animation:pandaArm 3s ease-in-out infinite;transform-origin:26px 96px}
+.state-idle #pd-armR{animation:pandaArmR 3s ease-in-out infinite;transform-origin:94px 96px}
+@keyframes pandaArm{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(-30deg)}}
+@keyframes pandaArmR{0%,100%{transform:rotate(20deg)}50%{transform:rotate(30deg)}}
+.state-idle #pd-earL{animation:pandaEar 2.5s ease-in-out infinite;transform-origin:24px 30px}
+.state-idle #pd-earR{animation:pandaEarR 2.5s ease-in-out infinite;transform-origin:96px 30px}
+@keyframes pandaEar{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes pandaEarR{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+`,
+  },
+
+  /* ═══════════════════════════════════════════════
+     🐧 企鹅 — 黑白身体 + 橘喙 + 小翅膀
+     ═══════════════════════════════════════════════ */
+  penguin: {
+    name: "小企鹅", emoji: "🐧",
+    svg: `<svg viewBox="0 0 120 130">
+  <defs><radialGradient id="pengBody"><stop offset="0%" stop-color="#3A3A5C"/><stop offset="100%" stop-color="#1A1A2E"/></radialGradient></defs>
+  <!-- 身体 -->
+  <ellipse cx="60" cy="88" rx="34" ry="38" fill="url(#pengBody)"/>
+  <!-- 白肚皮 -->
+  <ellipse cx="60" cy="94" rx="22" ry="28" fill="white"/>
+  <!-- 脚 -->
+  <ellipse cx="44" cy="122" rx="10" ry="5" fill="#FF8F00"/>
+  <ellipse cx="76" cy="122" rx="10" ry="5" fill="#FF8F00"/>
+  <!-- 翅膀 -->
+  <ellipse id="pg-wingL" cx="24" cy="80" rx="10" ry="28" fill="#1A1A2E" transform="rotate(15,24,80)"/>
+  <ellipse id="pg-wingR" cx="96" cy="80" rx="10" ry="28" fill="#1A1A2E" transform="rotate(-15,96,80)"/>
+  <!-- 头 -->
+  <ellipse cx="60" cy="46" rx="30" ry="28" fill="#1A1A2E"/>
+  <!-- 眼白 -->
+  <ellipse cx="47" cy="42" rx="8" ry="9" fill="white"/>
+  <ellipse cx="73" cy="42" rx="8" ry="9" fill="white"/>
+  <!-- 瞳孔 -->
+  <circle id="pg-pupL" cx="48" cy="43" r="4.5" fill="#111"/>
+  <circle id="pg-pupR" cx="74" cy="43" r="4.5" fill="#111"/>
+  <circle cx="50" cy="40" r="2" fill="white"/>
+  <circle cx="76" cy="40" r="2" fill="white"/>
+  <!-- 喙 -->
+  <polygon id="pg-beak" points="55,54 65,54 60,64" fill="#FF8F00"/>
+  <!-- 腮红 -->
+  <circle cx="38" cy="50" r="5" fill="rgba(255,150,150,.3)"/>
+  <circle cx="82" cy="50" r="5" fill="rgba(255,150,150,.3)"/>
+</svg>`,
+    css: `
+.state-idle #pg-wingL{animation:pengWing 2s ease-in-out infinite;transform-origin:24px 80px}
+.state-idle #pg-wingR{animation:pengWingR 2s ease-in-out infinite;transform-origin:96px 80px}
+@keyframes pengWing{0%,100%{transform:rotate(15deg)}50%{transform:rotate(5deg)}}
+@keyframes pengWingR{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(-5deg)}}
+.state-thinking #pg-beak{animation:beakClack .4s ease-in-out infinite;transform-origin:60px 59px}
+@keyframes beakClack{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.3)}}
+`,
+  },
+
+  /* ═══════════════════════════════════════════════
+     🦊 小狐狸 — 橙红 + 大尾巴 + 尖耳朵
+     ═══════════════════════════════════════════════ */
+  fox: {
+    name: "小狐狸", emoji: "🦊",
+    svg: `<svg viewBox="0 0 120 130">
+  <defs><radialGradient id="foxBody"><stop offset="0%" stop-color="#FF7043"/><stop offset="100%" stop-color="#D84315"/></radialGradient></defs>
+  <!-- 大尾巴 -->
+  <path id="fx-tail" d="M86,100 Q112,80 108,58 Q106,46 100,50 Q96,54 98,62 Q100,74 88,94" fill="url(#foxBody)"/>
+  <path d="M108,58 Q106,46 100,50 Q96,54 98,62 Q100,74 88,94" fill="white" opacity=".8"/>
+  <!-- 身体 -->
+  <ellipse cx="60" cy="96" rx="28" ry="22" fill="url(#foxBody)"/>
+  <ellipse cx="60" cy="100" rx="16" ry="12" fill="white"/>
+  <!-- 脚 -->
+  <ellipse cx="40" cy="114" rx="9" ry="7" fill="#D84315"/>
+  <ellipse cx="80" cy="114" rx="9" ry="7" fill="#D84315"/>
+  <!-- 耳朵 -->
+  <polygon id="fx-earL" points="28,36 14,4 42,24" fill="url(#foxBody)"/>
+  <polygon points="30,32 20,12 38,26" fill="white" opacity=".5"/>
+  <polygon id="fx-earR" points="92,36 106,4 78,24" fill="url(#foxBody)"/>
+  <polygon points="90,32 100,12 82,26" fill="white" opacity=".5"/>
+  <!-- 脸 -->
+  <ellipse cx="60" cy="56" rx="36" ry="32" fill="url(#foxBody)"/>
+  <!-- 脸颊白毛 -->
+  <ellipse cx="50" cy="66" rx="14" ry="10" fill="white" opacity=".85"/>
+  <ellipse cx="70" cy="66" rx="14" ry="10" fill="white" opacity=".85"/>
+  <!-- 眼睛 -->
+  <ellipse id="fx-eyeL" cx="44" cy="50" rx="7" ry="8" fill="white"/>
+  <ellipse id="fx-eyeR" cx="76" cy="50" rx="7" ry="8" fill="white"/>
+  <ellipse id="fx-pupL" cx="45" cy="51" rx="4" ry="5" fill="#1A0F08"/>
+  <ellipse id="fx-pupR" cx="77" cy="51" rx="4" ry="5" fill="#1A0F08"/>
+  <circle cx="47" cy="48" r="2" fill="white"/>
+  <circle cx="79" cy="48" r="2" fill="white"/>
+  <!-- 鼻子 -->
+  <ellipse cx="60" cy="64" rx="4" ry="3" fill="#1A0F08"/>
+  <!-- 嘴 -->
+  <path d="M55,69 Q60,73 65,69" fill="none" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+</svg>`,
+    css: `
+.state-idle #fx-tail{animation:foxTail 2s ease-in-out infinite;transform-origin:86px 100px}
+@keyframes foxTail{0%,100%{transform:rotate(0)}30%{transform:rotate(-15deg)}70%{transform:rotate(10deg)}}
+.state-idle #fx-earL{animation:foxEarL 3s ease-in-out infinite;transform-origin:28px 36px}
+.state-idle #fx-earR{animation:foxEarR 3s ease-in-out infinite;transform-origin:92px 36px}
+@keyframes foxEarL{0%,100%{transform:rotate(0)}40%{transform:rotate(-15deg)}}
+@keyframes foxEarR{0%,100%{transform:rotate(0)}40%{transform:rotate(15deg)}}
+`,
+  },
+
+  /* ═══════════════════════════════════════════════
+     🐸 小青蛙 — 绿色 + 大眼睛 + 长舌
+     ═══════════════════════════════════════════════ */
+  frog: {
+    name: "小青蛙", emoji: "🐸",
+    svg: `<svg viewBox="0 0 120 130">
+  <defs><radialGradient id="frogBody"><stop offset="0%" stop-color="#81C784"/><stop offset="100%" stop-color="#388E3C"/></radialGradient></defs>
+  <!-- 身体 -->
+  <ellipse cx="60" cy="90" rx="36" ry="32" fill="url(#frogBody)"/>
+  <ellipse cx="60" cy="96" rx="22" ry="16" fill="#C8E6C9"/>
+  <!-- 腿 -->
+  <ellipse cx="32" cy="112" rx="18" ry="10" fill="#388E3C" transform="rotate(-15,32,112)"/>
+  <ellipse cx="88" cy="112" rx="18" ry="10" fill="#388E3C" transform="rotate(15,88,112)"/>
+  <!-- 大眼睛 (突出) -->
+  <circle cx="40" cy="36" r="16" fill="url(#frogBody)"/>
+  <circle cx="80" cy="36" r="16" fill="url(#frogBody)"/>
+  <circle cx="40" cy="36" r="12" fill="white"/>
+  <circle cx="80" cy="36" r="12" fill="white"/>
+  <circle id="fg-pupL" cx="42" cy="37" r="6" fill="#111"/>
+  <circle id="fg-pupR" cx="82" cy="37" r="6" fill="#111"/>
+  <circle cx="44" cy="33" r="3" fill="white"/>
+  <circle cx="84" cy="33" r="3" fill="white"/>
+  <!-- 头 -->
+  <ellipse cx="60" cy="56" rx="34" ry="26" fill="url(#frogBody)"/>
+  <!-- 嘴 -->
+  <path id="fg-mouth" d="M42,62 Q60,72 78,62" fill="none" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
+  <!-- 腮红 -->
+  <circle cx="34" cy="58" r="5" fill="rgba(255,150,150,.3)"/>
+  <circle cx="86" cy="58" r="5" fill="rgba(255,150,150,.3)"/>
+  <!-- 前脚 -->
+  <ellipse cx="30" cy="100" rx="10" ry="7" fill="#4CAF50"/>
+  <ellipse cx="90" cy="100" rx="10" ry="7" fill="#4CAF50"/>
+</svg>`,
+    css: `
+.state-idle #fg-pupL{animation:frogBlink 3s ease-in-out infinite}
+.state-idle #fg-pupR{animation:frogBlink 3s ease-in-out infinite}
+@keyframes frogBlink{0%,95%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.state-thinking #fg-pupL,.state-thinking #fg-pupR{transform:translateY(-6px)}
+`,
+  },
+
+  /* ═══════════════════════════════════════════════
+     🐷 小猪 — 粉色 + 卷尾 + 猪鼻
+     ═══════════════════════════════════════════════ */
+  pig: {
+    name: "小猪猪", emoji: "🐷",
+    svg: `<svg viewBox="0 0 120 130">
+  <defs><radialGradient id="pigBody"><stop offset="0%" stop-color="#FFB0B0"/><stop offset="100%" stop-color="#E88080"/></radialGradient></defs>
+  <!-- 卷尾巴 -->
+  <path id="pg-tail" d="M88,92 Q106,80 100,68 Q96,58 92,62" fill="none" stroke="#E88080" stroke-width="5" stroke-linecap="round"/>
+  <!-- 身体 -->
+  <ellipse cx="60" cy="98" rx="32" ry="26" fill="url(#pigBody)"/>
+  <!-- 腿 -->
+  <rect x="36" y="110" width="12" height="14" rx="5" fill="#D07070"/>
+  <rect x="72" y="110" width="12" height="14" rx="5" fill="#D07070"/>
+  <!-- 耳朵 -->
+  <ellipse id="pi-earL" cx="26" cy="30" rx="10" ry="14" fill="#E88080" transform="rotate(-20,26,30)"/>
+  <ellipse id="pi-earR" cx="94" cy="30" rx="10" ry="14" fill="#E88080" transform="rotate(20,94,30)"/>
+  <!-- 脸 -->
+  <ellipse cx="60" cy="56" rx="36" ry="32" fill="url(#pigBody)"/>
+  <!-- 眼睛 -->
+  <circle id="pi-eyeL" cx="44" cy="48" r="7" fill="white"/>
+  <circle id="pi-eyeR" cx="76" cy="48" r="7" fill="white"/>
+  <circle id="pi-pupL" cx="45" cy="49" r="4" fill="#1A0F08"/>
+  <circle id="pi-pupR" cx="77" cy="49" r="4" fill="#1A0F08"/>
+  <circle cx="47" cy="46" r="2" fill="white"/>
+  <circle cx="79" cy="46" r="2" fill="white"/>
+  <!-- 猪鼻 -->
+  <ellipse cx="60" cy="64" rx="12" ry="9" fill="#D07070"/>
+  <ellipse cx="56" cy="63" rx="3" ry="2.5" fill="#A04040"/>
+  <ellipse cx="64" cy="63" rx="3" ry="2.5" fill="#A04040"/>
+  <!-- 嘴 -->
+  <path d="M54,72 Q60,76 66,72" fill="none" stroke="#C08080" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- 腮红 -->
+  <circle cx="34" cy="58" r="6" fill="rgba(255,100,100,.25)"/>
+  <circle cx="86" cy="58" r="6" fill="rgba(255,100,100,.25)"/>
+</svg>`,
+    css: `
+.state-idle #pg-tail{animation:pigTail 1.5s ease-in-out infinite;transform-origin:88px 92px}
+@keyframes pigTail{0%,100%{transform:rotate(0)}50%{transform:rotate(-20deg)}}
+.state-idle #pi-earL{animation:pigEar 2s ease-in-out infinite;transform-origin:26px 30px}
+.state-idle #pi-earR{animation:pigEarR 2s ease-in-out infinite;transform-origin:94px 30px}
+@keyframes pigEar{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(-30deg)}}
+@keyframes pigEarR{0%,100%{transform:rotate(20deg)}50%{transform:rotate(30deg)}}
+`,
+  },
+
 };
 
 CHARACTERS.default = CHARACTERS.mochi;
