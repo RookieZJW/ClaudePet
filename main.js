@@ -140,9 +140,8 @@ function createPetWindow() {
 // ── 轮询状态文件 ──────────────────────────────────
 function startStatusPolling() {
   ensureStatusDir();
-  if (!fs.existsSync(STATUS_FILE)) {
-    fs.writeFileSync(STATUS_FILE, JSON.stringify({ status: "idle", tool: "", timestamp: new Date().toISOString() }));
-  }
+  // 启动时强制重置为 idle，避免读到上次遗留的 session_end 等状态
+  fs.writeFileSync(STATUS_FILE, JSON.stringify({ status: "idle", tool: "", timestamp: new Date().toISOString() }));
   pollTimer = setInterval(() => {
     const data = readStatus();
     if (!data) return;

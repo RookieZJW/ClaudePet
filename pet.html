@@ -419,6 +419,30 @@ function spawnParticles(emojis,n=8){
 }
 let voiceEnabled=true;
 let bestVoice=null;
+let lastActivity=Date.now();
+let autoMuteTimer=null;
+const AUTO_MUTE_DELAY=5*60*1000; // 5分钟无操作自动静音
+
+function resetActivity(){
+  lastActivity=Date.now();
+  if(!voiceEnabled){voiceEnabled=true}
+  // 重置自动静音计时器
+  if(autoMuteTimer)clearTimeout(autoMuteTimer);
+  autoMuteTimer=setTimeout(autoMuteCheck,5000);
+}
+function autoMuteCheck(){
+  const idle=Date.now()-lastActivity;
+  if(idle>=AUTO_MUTE_DELAY&&voiceEnabled){
+    playSound('idle1.mp3','Zzz...');
+    setTimeout(()=>{
+      if(!voiceEnabled)return;
+      voiceEnabled=false;speechSynthesis.cancel();
+      showBubble('🔇 长时间无操作, 已自动静音',3000);
+    },1500);
+  }
+  if(autoMuteTimer)clearTimeout(autoMuteTimer);
+  autoMuteTimer=setTimeout(autoMuteCheck,10000);
+}
 const SOUND_DIR='sounds/';
 // 预加载音频缓存
 const audioCache={};
@@ -539,6 +563,7 @@ function stopIdleBubbles(){if(idleBubbleTimer){clearInterval(idleBubbleTimer);id
    ═══════════════════════════════════════════ */
 function setStatus(data){
   const s=data.status||'idle',tool=data.tool||'';
+  if(s!==currentState)resetActivity();
   if(s===currentState)return;
   if(s!=='idle')playStateSound(s,tool);
   currentState=s;
@@ -633,6 +658,7 @@ document.addEventListener('mouseup',e=>{
   winX=winStartX+(e.screenX-startX);
   winY=winStartY+(e.screenY-startY);
   if(!hasMoved){
+    resetActivity();
     showBubble(['你好呀! 🐱','我在盯着 Claude 呢~','别戳我! >_<','喵~','可以拖着我走哦!'][Math.floor(Math.random()*5)],2000);
   }
 });
@@ -669,7 +695,8 @@ if(window.claudePet){window.claudePet.onPomoStatus(d=>updatePomo(d));window.clau
    ═══════════════════════════════════════════ */
 // 获取窗口初始位置，避免首次拖拽跳屏
 if(window.claudePet){window.claudePet.getWindowPos().then(p=>{winX=p.x;winY=p.y})}
-console.log('🐱 Claude Pet v1.2 已就绪!');
+resetActivity(); // 启动自动静音计时
+console.log('🐱 Claude Pet 已就绪!');
 console.log('  - 拖拽移动 | 右键菜单 | 5 套主题');
 console.log('  - 窗口吸附 | 眨眼/哈欠/伸懒腰');
 setTimeout(()=>{setStatus({status:'session_start'});setTimeout(()=>setStatus({status:'idle'}),3000)},500);
